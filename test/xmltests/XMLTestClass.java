@@ -1,4 +1,4 @@
-package test.xmltests;
+package xmltests;
 
 import org.junit.Test;
 
