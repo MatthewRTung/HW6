@@ -1,6 +1,8 @@
 package cs3500.planner.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,5 +79,28 @@ public class CentralSystem implements CentralSystemModel {
   @Override
   public Map<String, Schedule> getAllSchedules() {
     return new HashMap<>(userSchedules);
+  }
+
+  @Override
+  public List<String> getUserName() {
+    return new ArrayList<>(userSchedules.keySet());
+  }
+
+  @Override
+  public boolean doesEventConflict(Event event, String userName) {
+    Schedule userSchedule = userSchedules.get(userName);
+    if (userSchedule == null) {
+      throw new IllegalArgumentException("User does not exist.");
+    }
+    return !userSchedule.isFree(event);
+  }
+
+  @Override
+  public List<Event> getEventsForUser(String userName) {
+    Schedule userSchedule = userSchedules.get(userName);
+    if (userSchedule == null) {
+      throw new IllegalArgumentException("User does not exist.");
+    }
+    return userSchedule.getEvents();
   }
 }

@@ -96,4 +96,14 @@ public class Schedule implements ScheduleModel {
     }
     return weeklyEvents;
   }
+
+  @Override
+  public List<Event> getEvents() {
+    return new ArrayList<>(events);
+  }
+
+  @Override
+  public boolean isFree(Event event) {
+    return isTimeSlotFree(event.getStartTime(), event.getEndTime());
+  }
 }

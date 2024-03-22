@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Interface for the main system model of the NUPlanner.
  */
-public interface CentralSystemModel {
+public interface CentralSystemModel extends ReadOnlyCentralSystemModel {
 
   /**
    * Adds a new user to the system.

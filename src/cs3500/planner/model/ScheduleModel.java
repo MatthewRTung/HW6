@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Represents an event in the system.
  */
-public interface ScheduleModel {
+public interface ScheduleModel extends ReadonlySchedule {
   /**
    * Adds an event to the schedule if it does not conflict with existing events.
    * @param event The event to add.

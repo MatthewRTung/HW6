@@ -93,6 +93,11 @@ public class Event implements EventModel, Comparable<EventModel> {
   }
 
   @Override
+  public String getEventName() {
+    return name;
+  }
+
+  @Override
   public LocalDateTime getStartTime() {
     return startTime;
   }
