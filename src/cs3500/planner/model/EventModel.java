@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Represents an event in the system.
  */
-public interface EventModel extends ReadonlyEventModel {
+public interface EventModel extends ReadOnlyEventModel {
   /**
    * Checks if the event overlaps with another event.
    * Events are only allowed to overlap if the original event ends where the next event begins.

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Provides a read-only view of an event's details.
  */
-public interface ReadonlyEventModel {
+public interface ReadOnlyEventModel {
 
   /**
    * Gets the name of the event.
