@@ -4,6 +4,8 @@ import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.model.EventModel;
@@ -13,7 +15,7 @@ import cs3500.planner.model.ScheduleModel;
 /**
  * A textual view for the planner in a specific format.
  */
-public class PlannerTextView implements PlannerView {
+public class PlannerTextView extends JFrame implements PlannerView {
 
   private final CentralSystem centralSystem;
 

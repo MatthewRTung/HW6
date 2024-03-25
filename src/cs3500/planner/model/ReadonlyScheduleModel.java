@@ -2,7 +2,7 @@ package cs3500.planner.model;
 
 import java.util.List;
 
-public interface ReadonlySchedule {
+public interface ReadonlyScheduleModel {
 
   /**
    * Retrieves all events in the schedule.

@@ -88,7 +88,7 @@ public class ScheduleTest {
     schedule.addEvent(event1);
     List<Event> eventsAtTime = schedule.getEventsAt(event1.getStartTime().plusMinutes(30));
     assertFalse(eventsAtTime.isEmpty());
-    assertEquals(event1.getName(), eventsAtTime.getFirst().getName());
+    assertEquals(event1.getName(), eventsAtTime.get(0).getName());
   }
 
   @Test
