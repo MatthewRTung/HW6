@@ -40,5 +40,6 @@ and also noted it here in the ReadMe just in case)
 Changes for PT2:
 - Created a read only interface for each class that we made. The model for each class extends the
 ReadOnlyModel that we created.
-- Added new methods meant to hide the implementation details of the class and only give the client
+- Used to hide the implementation details of the class and only give the client
 what needs to be seen.
+- Implemented only specific methods that a client should be able to see.
