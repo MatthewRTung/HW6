@@ -1,8 +1,19 @@
 package cs3500.planner.view;
 
-import java.awt.GridLayout;
+import java.awt.*;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.DefaultListModel;
+
+import cs3500.planner.model.Event;
 
 import cs3500.planner.model.ReadOnlyScheduleModel;
 
@@ -17,12 +28,11 @@ public class EventFrame extends JFrame implements EventView {
   private JTextField startingTimeField;
   private JTextField endingTimeField;
   private JList<String> userList;
-  private JButton createButton;
   private JButton removeButton;
   private JButton modifyButton;
 
   public EventFrame(ReadOnlyScheduleModel readonlyModel) {
-    super("Event Management");
+    super("Event Planner");
     this.readonlyModel = readonlyModel;
     initializeComponents();
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -31,55 +41,116 @@ public class EventFrame extends JFrame implements EventView {
   }
 
   private void initializeComponents() {
-    this.setLayout(new GridLayout(0, 2));
+    this.setLayout(new GridBagLayout());
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.insets = new Insets(5, 5, 5, 5);
 
+    //Event Name
     eventNameField = new JTextField();
-    this.add(new JLabel("Event Name:"));
-    this.add(eventNameField);
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    this.add(new JLabel("Event Name:"), constraints);
+    constraints.gridx = 1;
+    constraints.gridwidth = 1;
+    this.add(eventNameField, constraints);
 
+    //Location Label
     eventLocationField = new JTextField();
-    this.add(new JLabel("Location:"));
-    this.add(eventLocationField);
+    constraints.gridx = 0;
+    constraints.gridy = 1;
+    constraints.gridwidth = 1;
+    this.add(new JLabel("Location:"), constraints);
+    constraints.gridx = 1;
+    constraints.gridwidth = 1;
+    this.add(eventLocationField, constraints);
 
-    isOnlineCheckbox = new JCheckBox("Is online");
-    this.add(isOnlineCheckbox);
+    //Online Checkbox
+    isOnlineCheckbox = new JCheckBox("Is Online");
+    constraints.gridx = 0;
+    constraints.gridy = 2;
+    constraints.gridwidth = 4; // Span two columns
+    this.add(isOnlineCheckbox, constraints);
 
+    //Starting Day ComboBox
     String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     startingDayComboBox = new JComboBox<>(daysOfWeek);
-    this.add(new JLabel("Starting Day:"));
-    this.add(startingDayComboBox);
+    constraints.gridx = 0;
+    constraints.gridy = 3;
+    constraints.gridwidth = 1;
+    this.add(new JLabel("Starting Day:"), constraints);
+    constraints.gridx = 0;
+    constraints.gridy = 4;
+    this.add(startingDayComboBox, constraints);
 
-    endingDayComboBox = new JComboBox<>(daysOfWeek);
-    this.add(new JLabel("Ending Day:"));
-    this.add(endingDayComboBox);
-
+    //Starting Time Field
     startingTimeField = new JTextField();
-    this.add(new JLabel("Starting Time:"));
-    this.add(startingTimeField);
+    constraints.gridx = 0;
+    constraints.gridy = 5;
+    this.add(new JLabel("Starting Time:"), constraints);
+    constraints.gridy = 6;
+    this.add(startingTimeField, constraints);
 
+    //Ending Day ComboBox
+    endingDayComboBox = new JComboBox<>(daysOfWeek);
+    constraints.gridx = 1;
+    constraints.gridy = 3;
+    this.add(new JLabel("Ending Day:"), constraints);
+    constraints.gridx = 4;
+    this.add(endingDayComboBox, constraints);
+
+    constraints.gridx = 1;
+    constraints.gridy = 4;
+    this.add(endingDayComboBox, constraints);
+
+    //Ending Time Field
     endingTimeField = new JTextField();
-    this.add(new JLabel("Ending Time:"));
-    this.add(endingTimeField);
+    constraints.gridx = 1;
+    constraints.gridy = 5;
+    this.add(new JLabel("Ending Time:"), constraints);
+    constraints.gridy = 6;
+    this.add(endingTimeField, constraints);
 
-    userList = new JList<>();
-    userList.setModel(new DefaultListModel<>()); // This should be populated with user data from the model
-    this.add(new JLabel("Available users"));
-    this.add(new JScrollPane(userList));
+    //Users List
+    userList = new JList<>(new DefaultListModel<>());
+    userList.setVisibleRowCount(4);
+    JScrollPane userListScrollPane = new JScrollPane(userList);
+    constraints.gridx = 0;
+    constraints.gridy = 8;
+    constraints.gridwidth = 3; // Span four columns for list
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.weightx = 1.0;
+    constraints.weighty = 1.0;
+    this.add(userListScrollPane, constraints);
 
-    createButton = new JButton("Create Event");
-    createButton.addActionListener(e -> createEvent());
-    this.add(createButton);
+    constraints.gridx = 0;
+    constraints.gridy = 7;
+    constraints.gridwidth = 2;
+    this.add(new JLabel("Available Users:"), constraints);
 
+    //Reset
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weighty = 0;
+
+    //Modify Button
+    modifyButton = new JButton("Modify Event");
+    modifyButton.addActionListener(e -> modifyEvent());
+    constraints.gridx = 1;
+    constraints.gridy = 9;
+    constraints.gridwidth = 1;
+    this.add(modifyButton, constraints);
+
+    //Remove Button
     removeButton = new JButton("Remove Event");
     removeButton.addActionListener(e -> removeEvent());
-    this.add(removeButton);
-
-    modifyButton = new JButton("Modify Event");
-    // Add action listener for modify if needed
-    this.add(modifyButton);
+    constraints.gridx = 0;
+    constraints.gridy = 9;
+    constraints.gridwidth = 1;
+    this.add(removeButton, constraints);
   }
 
-  private void createEvent() {
+  //need to implement this
+  private void modifyEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
       System.out.println("Create event: " + eventDetails);
@@ -98,14 +169,12 @@ public class EventFrame extends JFrame implements EventView {
   }
 
   private boolean validateInput() {
-    // Example validation: Check if the event name or times are empty
     return !eventNameField.getText().trim().isEmpty() &&
             !startingTimeField.getText().trim().isEmpty() &&
             !endingTimeField.getText().trim().isEmpty();
   }
 
   private String getEventDetails() {
-    // Construct event details from user inputs
     String selectedUsers = String.join(", ", userList.getSelectedValuesList());
     return "Name: " + eventNameField.getText() +
             ", Location: " + eventLocationField.getText() +
@@ -117,15 +186,15 @@ public class EventFrame extends JFrame implements EventView {
             ", Users: " + selectedUsers;
   }
 
-  @Override
-  public void setEventDetails(cs3500.planner.model.Event event) {
-    // Populate fields with event details if modifying an existing event
-  }
-
-  @Override
-  public void clearForm() {
-    // Clear all input fields and selections
-  }
+//  @Override
+//  public void setEventDetails(Event event) {
+//    // Populate fields with event details if modifying an existing event
+//  }
+//
+//  @Override
+//  public void clearForm() {
+//    // Clear all input fields and selections
+//  }
 
   @Override
   public void displayError(String message) {
