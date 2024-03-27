@@ -59,10 +59,21 @@ public class Event implements EventModel, Comparable<EventModel> {
     this.hostId = hostId;
   }
 
+  /**
+   * Checks whether an event overalps.
+   * @param event the event to check for overlap
+   * @return true or false based on whether or not the event overlaps.
+   */
+
   @Override
   public boolean overlaps(Event event) {
     return !startTime.isAfter(event.getEndTime()) && !endTime.isBefore(event.getStartTime());
   }
+
+  /**
+   * Adds an invitee to the event.
+   * @param userId the ID of the user to add
+   */
 
   @Override
   public void addInvitee(String userId) {
@@ -71,10 +82,20 @@ public class Event implements EventModel, Comparable<EventModel> {
     }
   }
 
+  /**
+   * Removes invitee from the event.
+   * @param userId the ID of the user to remove
+   */
+
   @Override
   public void removeInvitee(String userId) {
     userList.remove(userId);
   }
+
+  /**
+   * Gets the location of the event.
+   * @return the name of the location of the event.
+   */
 
   @Override
   public String getLocation() {
@@ -87,40 +108,81 @@ public class Event implements EventModel, Comparable<EventModel> {
     }
   }
 
+  /**
+   * Gets the name of the event.
+   * @return the name of the event.
+   */
+
   @Override
   public String getName() {
     return name;
   }
+
+  /**
+   * Gets the name of the event.
+   * @return the name of the event.
+   */
 
   @Override
   public String getEventName() {
     return name;
   }
 
+  /**
+   * Gets the start time of the event.
+   * @return the start time of the event.
+   */
+
   @Override
   public LocalDateTime getStartTime() {
     return startTime;
   }
+
+  /**
+   * Gets the end time of the event.
+   * @return the end time of the event.
+   */
 
   @Override
   public LocalDateTime getEndTime() {
     return endTime;
   }
 
+  /**
+   * Gets the list of invitees for the event.
+   * @return the list of invitees for the event.
+   */
+
   @Override
   public List<String> getInvitees() {
     return new ArrayList<>(userList);
   }
+
+  /**
+   * Checks whether the event is online or not.
+   * @return true if the event is online, false otherwise.
+   */
 
   @Override
   public boolean isOnline() {
     return isOnline;
   }
 
+  /**
+   * Checks if the inputted user is invited.
+   * @param userId the ID of the user to check
+   * @return true if the user is invited, false otherwise.
+   */
+
   @Override
   public boolean isUserInvited(String userId) {
     return userList.contains(userId);
   }
+
+  /**
+   * Checks whether the event is currently happening.
+   * @return true if it is, false otherwise.
+   */
 
   @Override
   public boolean isCurrentlyHappening() {
@@ -128,10 +190,21 @@ public class Event implements EventModel, Comparable<EventModel> {
     return now.isAfter(startTime) && now.isBefore(endTime);
   }
 
+  /**
+   * Compares two start times.
+   * @param other the event to compare with
+   * @return 1 if the event is the same, 0 otherwise.
+   */
+
   @Override
   public int compareTo(EventModel other) {
     return this.startTime.compareTo(other.getStartTime());
   }
+
+  /**
+   * Returns the host id.
+   * @return a string representing the host id.
+   */
 
   @Override
   public String getHostId() {
@@ -142,9 +215,4 @@ public class Event implements EventModel, Comparable<EventModel> {
   private boolean isHybrid() {
     return isHybrid;
   }
-
-  //TODO: Implement automatic event scheduling
-  //Implement a way to check if a physical location is available when scheduling an event
-  //Ensure that logic throughout the system can handle an even being both online and in person
-  //Maybe use ID instead of name.
 }
