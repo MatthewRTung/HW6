@@ -10,7 +10,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import cs3500.planner.model.ReadOnlyCentralSystemModel;
+import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.xml.XMLConfigurator;
 
@@ -20,9 +20,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JButton loadButton;
   private JButton saveButton;
   private final List<Event> events;
-  private final ReadOnlyCentralSystemModel model;
+  private final CentralSystem model;
 
-  public CentralSystemFrame(ReadOnlyCentralSystemModel model) {
+  public CentralSystemFrame(CentralSystem model) {
     super("Planner Central System");
     this.model = model;
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,27 +117,31 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     JPanel controlPanel = new JPanel(new GridLayout(1, 0, 5, 0));
     loadButton = new JButton("Create event");
     saveButton = new JButton("Schedule event");
-    //takes list of user names to pick from
-    userDropDown = new JComboBox<String>(); // when no user is selected, should say <none>
-    userDropDown.addItem("<none>"); // new
+    //takes list of user-names to pick from
+    userDropDown = new JComboBox<>();
+    userDropDown.addItem("<none>");
     for (String userName : model.getUserName()) {
       userDropDown.addItem(userName);
     }
     userDropDown.addActionListener(e -> {
       String selectedUser = Objects.requireNonNull(userDropDown.getSelectedItem()).toString();
-      if (!"<non>".equals(selectedUser)) {
+      if (!"<none>".equals(selectedUser)) {
         loadUserSchedule(selectedUser);
       }
     });
-    loadButton.addActionListener(this::loadXMLAction);
     saveButton.addActionListener(this::saveSchedulesAction);
 
-    controlPanel.add(userDropDown); // new
+    loadButton.addActionListener(e -> {
+      EventFrame eventFrame = new EventFrame(model);
+      eventFrame.setVisible(true);
+    });
+
+    controlPanel.add(userDropDown);
     controlPanel.add(loadButton);
     controlPanel.add(saveButton);
 
-    loadButton.setHorizontalAlignment(SwingConstants.CENTER); // new
-    saveButton.setHorizontalAlignment(SwingConstants.CENTER); // new
+    loadButton.setHorizontalAlignment(SwingConstants.CENTER);
+    saveButton.setHorizontalAlignment(SwingConstants.CENTER);
     this.add(controlPanel, BorderLayout.SOUTH);
   }
 
@@ -147,15 +151,29 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     if (option == JFileChooser.APPROVE_OPTION) {
       File selectedFile = fileChooser.getSelectedFile();
       XMLConfigurator configurator = new XMLConfigurator();
-      List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
-      System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+      String userId = configurator.readScheduleUserId(selectedFile.getAbsolutePath());
+      if (userId != null && !userId.isEmpty()) {
+        if (!model.getUserName().contains(userId)) {
+          userDropDown.addItem(userId);
+          userDropDown.setSelectedItem(userId);
+          model.addUser(userId);
+        }
+        List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
+        for (Event event : events) {
+          model.createEvent(userId, event);
+        }
+        loadUserSchedule(userId);
+        updateView();
+      } else {
+        displayError("The user ID could not be read from the XML file.");
+      }
     }
   }
 
   private void loadUserSchedule(String userId) {
     events.clear();
     events.addAll(model.getEventsForUser(userId));
-    repaint();
+    schedulePanel.repaint();
   }
 
   private void saveSchedulesAction(ActionEvent e) {
@@ -163,9 +181,34 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     System.out.println("Save schedules action triggered");
   }
 
+  protected void updateEvent(Event eventDetails) {
+    events.add(eventDetails);
+    schedulePanel.repaint();
+  }
+
+  @Override
+  public void repaint() {
+    super.repaint();
+    if (schedulePanel != null) {
+      schedulePanel.repaint();
+    }
+  }
+
   @Override
   public void updateView() {
-    // Method to update the view when model changes
+    String selectedUser = Objects.requireNonNull(userDropDown.getSelectedItem()).toString();
+    userDropDown.removeAllItems();
+    userDropDown.addItem("<none>");
+    for (String userName : model.getUserName()) {
+      userDropDown.addItem(userName);
+    }
+    userDropDown.setSelectedItem(selectedUser);
+    if (selectedUser != null && !"<none>".equals(selectedUser)) {
+      loadUserSchedule(selectedUser);
+    } else {
+      events.clear();
+      schedulePanel.repaint();
+    }
   }
 
   @Override

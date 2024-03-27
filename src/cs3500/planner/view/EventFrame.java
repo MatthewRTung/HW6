@@ -13,12 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.DefaultListModel;
 
-import cs3500.planner.model.Event;
-
-import cs3500.planner.model.ReadOnlyScheduleModel;
+import cs3500.planner.model.CentralSystem;
 
 public class EventFrame extends JFrame implements EventView {
-  private ReadOnlyScheduleModel readonlyModel;
+  private CentralSystem centralSystem;
+  private CentralSystemFrame frame;
 
   private JTextField eventNameField;
   private JTextField eventLocationField;
@@ -31,9 +30,13 @@ public class EventFrame extends JFrame implements EventView {
   private JButton removeButton;
   private JButton modifyButton;
 
-  public EventFrame(ReadOnlyScheduleModel readonlyModel) {
+  public EventFrame(CentralSystem centralSystem) {
     super("Event Planner");
-    this.readonlyModel = readonlyModel;
+    this.centralSystem = centralSystem;
+    removeButton = new JButton("Remove Event");
+    modifyButton = new JButton("Modify Event");
+    modifyButton.addActionListener(e -> modifyEvent());
+    removeButton.addActionListener(e -> removeEvent());
     initializeComponents();
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     this.pack();
@@ -45,7 +48,6 @@ public class EventFrame extends JFrame implements EventView {
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.insets = new Insets(5, 5, 5, 5);
-
     //Event Name
     eventNameField = new JTextField();
     constraints.gridx = 0;
@@ -54,7 +56,6 @@ public class EventFrame extends JFrame implements EventView {
     constraints.gridx = 1;
     constraints.gridwidth = 1;
     this.add(eventNameField, constraints);
-
     //Location Label
     eventLocationField = new JTextField();
     constraints.gridx = 0;
@@ -64,14 +65,12 @@ public class EventFrame extends JFrame implements EventView {
     constraints.gridx = 1;
     constraints.gridwidth = 1;
     this.add(eventLocationField, constraints);
-
     //Online Checkbox
     isOnlineCheckbox = new JCheckBox("Is Online");
     constraints.gridx = 0;
     constraints.gridy = 2;
     constraints.gridwidth = 4; // Span two columns
     this.add(isOnlineCheckbox, constraints);
-
     //Starting Day ComboBox
     String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     startingDayComboBox = new JComboBox<>(daysOfWeek);
@@ -82,7 +81,6 @@ public class EventFrame extends JFrame implements EventView {
     constraints.gridx = 0;
     constraints.gridy = 4;
     this.add(startingDayComboBox, constraints);
-
     //Starting Time Field
     startingTimeField = new JTextField();
     constraints.gridx = 0;
@@ -90,7 +88,6 @@ public class EventFrame extends JFrame implements EventView {
     this.add(new JLabel("Starting Time:"), constraints);
     constraints.gridy = 6;
     this.add(startingTimeField, constraints);
-
     //Ending Day ComboBox
     endingDayComboBox = new JComboBox<>(daysOfWeek);
     constraints.gridx = 1;
@@ -98,11 +95,9 @@ public class EventFrame extends JFrame implements EventView {
     this.add(new JLabel("Ending Day:"), constraints);
     constraints.gridx = 4;
     this.add(endingDayComboBox, constraints);
-
     constraints.gridx = 1;
     constraints.gridy = 4;
     this.add(endingDayComboBox, constraints);
-
     //Ending Time Field
     endingTimeField = new JTextField();
     constraints.gridx = 1;
@@ -110,7 +105,6 @@ public class EventFrame extends JFrame implements EventView {
     this.add(new JLabel("Ending Time:"), constraints);
     constraints.gridy = 6;
     this.add(endingTimeField, constraints);
-
     //Users List
     userList = new JList<>(new DefaultListModel<>());
     userList.setVisibleRowCount(4);
@@ -122,27 +116,19 @@ public class EventFrame extends JFrame implements EventView {
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
     this.add(userListScrollPane, constraints);
-
     constraints.gridx = 0;
     constraints.gridy = 7;
     constraints.gridwidth = 2;
     this.add(new JLabel("Available Users:"), constraints);
-
     //Reset
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0;
-
     //Modify Button
-    modifyButton = new JButton("Modify Event");
-    modifyButton.addActionListener(e -> modifyEvent());
     constraints.gridx = 1;
     constraints.gridy = 9;
     constraints.gridwidth = 1;
     this.add(modifyButton, constraints);
-
     //Remove Button
-    removeButton = new JButton("Remove Event");
-    removeButton.addActionListener(e -> removeEvent());
     constraints.gridx = 0;
     constraints.gridy = 9;
     constraints.gridwidth = 1;
@@ -155,7 +141,7 @@ public class EventFrame extends JFrame implements EventView {
       String eventDetails = getEventDetails();
       System.out.println("Create event: " + eventDetails);
     } else {
-      displayError("Error: Missing event information.");
+      displayError("Error: Missing event information for modification.");
     }
   }
 
@@ -175,15 +161,15 @@ public class EventFrame extends JFrame implements EventView {
   }
 
   private String getEventDetails() {
-    String selectedUsers = String.join(", ", userList.getSelectedValuesList());
-    return "Name: " + eventNameField.getText() +
-            ", Location: " + eventLocationField.getText() +
-            ", Is Online: " + isOnlineCheckbox.isSelected() +
-            ", Starting Day: " + startingDayComboBox.getSelectedItem() +
-            ", Ending Day: " + endingDayComboBox.getSelectedItem() +
-            ", Starting Time: " + startingTimeField.getText() +
-            ", Ending Time: " + endingTimeField.getText() +
-            ", Users: " + selectedUsers;
+    String result = "";
+    result += eventNameField.getText().trim() + " ";
+    result += eventLocationField.getText().trim() + " ";
+    result += isOnlineCheckbox.isSelected() + " ";
+    result += startingDayComboBox.getSelectedItem() + " ";
+    result += startingTimeField.getText().trim() + " ";
+    result += endingDayComboBox.getSelectedItem() + " ";
+    result += endingTimeField.getText().trim();
+    return result;
   }
 
 //  @Override

@@ -74,6 +74,23 @@ public class XMLConfigurator implements XMLProcessor {
     }
   }
 
+  /**
+   * This method reads the user ID from the schedule tag in the XML file.
+   *
+   * @param filePath The path to the XML file.
+   * @return The user ID as a String.
+   */
+  public String readScheduleUserId(String filePath) {
+    try {
+      Document doc = parseXMLDocument(filePath);
+      Element scheduleElement = (Element) doc.getElementsByTagName("schedule").item(0);
+      return scheduleElement.getAttribute("id");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return "";
+  }
+
   //helper method that parses an XML file and returns a DOM Document object.
   private Document parseXMLDocument(String filePath) throws Exception {
     File inputFile = new File(filePath);
