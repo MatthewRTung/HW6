@@ -27,6 +27,13 @@ public class CentralSystem implements CentralSystemModel {
     }
   }
 
+  /**
+   * Removes a user from the system.
+   *
+   * @param userId The UserID of the user to remove.
+   * @return true if the user was successfully removed, false if the user does not exist.
+   */
+
   @Override
   public boolean removeUser(String userId) {
     if (userSchedules.containsKey(userId)) {
@@ -36,6 +43,14 @@ public class CentralSystem implements CentralSystemModel {
     return false;
   }
 
+  /**
+   * Retrieves the schedule for a specified user.
+   *
+   * @param userId The UserId of the user whose schedule is to be retrieved.
+   * @return The ScheduleModel associated with the given user, or null if the user
+   *         does not exist.
+   */
+
   @Override
   public Schedule getUserSchedule(String userId) {
     if (userId == null || userId.isEmpty()) {
@@ -43,6 +58,15 @@ public class CentralSystem implements CentralSystemModel {
     }
     return userSchedules.get(userId);
   }
+
+  /**
+   * Creates a new event in a user's schedule.
+   *
+   * @param userId The UserId of the user for whom the event is to be created.
+   * @param event  The event to be added to the user's schedule.
+   * @return true if the event was successfully created and added, false if not
+   *         or the user does not exist.
+   */
 
   @Override
   public boolean createEvent(String userId, Event event) {
@@ -52,6 +76,16 @@ public class CentralSystem implements CentralSystemModel {
     }
     return false;
   }
+
+  /**
+   * Modifies an existing event in a user's schedule.
+   *
+   * @param userId The UserId of the user whose event is to be modified.
+   * @param eventId The UserId of the event to be modified.
+   * @param updatedEvent The updated event details to replace the existing event.
+   * @return true if the event was successfully modified, false if the event does not exist,
+   *         or the user does not exist.
+   */
 
   @Override
   public boolean modifyEvent(String userId, String eventId, Event updatedEvent) {
@@ -68,6 +102,14 @@ public class CentralSystem implements CentralSystemModel {
     return false;
   }
 
+  /**
+   * Deletes an event from a user's schedule.
+   *
+   * @param userId  The UserId of the user whose event is to be deleted.
+   * @param eventId The UserId of the event to be deleted.
+   * @return true if the event was successfully deleted, false if the event or user does not exist.
+   */
+
   @Override
   public boolean deleteEvent(String userId, String eventId) {
     ScheduleModel schedule = userSchedules.get(userId);
@@ -77,15 +119,31 @@ public class CentralSystem implements CentralSystemModel {
     return false;
   }
 
+  /**
+   * Retrieves the list of all the schedules in the system.
+   * @return The list of all schedules.
+   */
   @Override
   public Map<String, Schedule> getAllSchedules() {
     return new HashMap<>(userSchedules);
   }
 
+  /**
+   * Retrieves the list of all the names of the users in the system.
+   * @return the list of all names.
+   */
+
   @Override
   public List<String> getUserName() {
     return new ArrayList<>(userSchedules.keySet());
   }
+
+  /**
+   * Checks to see if there is an event conflict with a specific user.
+   * @param event the event to check for conflicts.
+   * @param userName the name of the user to check the event against.
+   * @return true or false based on whether there is a conflict or not.
+   */
 
   @Override
   public boolean doesEventConflict(Event event, String userName) {
@@ -95,6 +153,12 @@ public class CentralSystem implements CentralSystemModel {
     }
     return !userSchedule.isFree(event);
   }
+
+  /**
+   * Gets a list of events for a specific user.
+   * @param userName the name of the user whose events are to be retrieved.
+   * @return a list of events for that specific user.
+   */
 
   @Override
   public List<Event> getEventsForUser(String userName) {
