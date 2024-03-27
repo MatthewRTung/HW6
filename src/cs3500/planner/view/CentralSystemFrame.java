@@ -1,21 +1,47 @@
 package cs3500.planner.view;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.SwingConstants;
 
-import java.awt.*;
+import java.awt.Rectangle;
+import java.awt.Point;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Graphics;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.xml.XMLConfigurator;
 
+/***
+ *
+ */
 public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JPanel schedulePanel;
   private JComboBox<String> userDropDown;
@@ -23,18 +49,77 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JButton saveButton;
   private final List<Event> events;
   private final CentralSystem model;
+  private final Map<Rectangle, Event> eventRectangles;
+  private EventFrame currentFrame;
+  private Point dragStart;
+  private Point dragEnd;
 
+  /**
+   *
+   * @param model
+   */
   public CentralSystemFrame(CentralSystem model) {
     super("Planner Central System");
     this.model = model;
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setLayout(new BorderLayout());
     events = new ArrayList<>();
+    eventRectangles = new HashMap<>();
+    currentFrame = null;
+    dragStart = null;
+    dragEnd = null;
     initializeMenu();
     initializeSchedulePanel();
+    eventListener();
     initializeControlPanel();
     this.pack();
     this.setVisible(true);
+  }
+
+  @Override
+  public void repaint() {
+    super.repaint();
+    if (schedulePanel != null) {
+      schedulePanel.repaint();
+    }
+  }
+
+  @Override
+  public void updateView() {
+    //get the user and handle null users
+    Object selectedItem = userDropDown.getSelectedItem();
+    String selectedUser = (selectedItem != null) ? selectedItem.toString() : null;
+    //remove action listener
+    ActionListener[] listeners = userDropDown.getActionListeners();
+    for (ActionListener listener : listeners) {
+      userDropDown.removeActionListener(listener);
+    }
+    //update drop-down
+    userDropDown.removeAllItems();
+    userDropDown.addItem("<none>");
+    for (String userName : model.getUserName()) {
+      userDropDown.addItem(userName);
+    }
+    //restore action listener
+    for (ActionListener listener : listeners) {
+      userDropDown.addActionListener(listener);
+    }
+    //set the selected item if it exists
+    if (selectedUser != null && Objects.equals(userDropDown.getItemCount(), selectedUser)) {
+      userDropDown.setSelectedItem(selectedUser);
+    }
+    //load the schedule if its valid
+    if (selectedUser != null && !"<none>".equals(selectedUser)) {
+      loadUserSchedule(selectedUser);
+    } else {
+      events.clear();
+      schedulePanel.repaint();
+    }
+  }
+
+  @Override
+  public void displayError(String message) {
+    JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
 
   private void initializeMenu() {
@@ -52,45 +137,46 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
 
   private void initializeSchedulePanel() {
     schedulePanel = new JPanel() {
-      @Override
-      protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        drawGrid(g);
-        drawEvents(g);
+      protected void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+        drawGrid(graphics);
+        drawEvents(graphics);
+        drawSelection(graphics);
       }
     };
     schedulePanel.setPreferredSize(new Dimension(800, 600));
     this.add(schedulePanel, BorderLayout.CENTER);
   }
 
-  private void drawGrid(Graphics g) {
-    g.setColor(Color.LIGHT_GRAY);
+  private void drawGrid(Graphics graphics) {
+    graphics.setColor(Color.LIGHT_GRAY);
     int rows = 24;
     int cols = 7;
     int cellWidth = schedulePanel.getWidth() / cols;
     int cellHeight = schedulePanel.getHeight() / rows;
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        g.drawRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+        graphics.drawRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
       }
       if (i % 4 == 0) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, i * cellHeight - 1, schedulePanel.getWidth(), 2);
+        graphics.setColor(Color.BLACK);
+        graphics.fillRect(0, i * cellHeight - 1, schedulePanel.getWidth(), 2);
       }
     }
   }
 
-  private void drawEvents(Graphics g) {
+  private void drawEvents(Graphics graphics) {
+    eventRectangles.clear();
     int cellWidth = schedulePanel.getWidth() / 7;
     int cellHeight = schedulePanel.getHeight() / 24;
-    g.setColor(Color.RED);
+    graphics.setColor(Color.RED);
     for (Event event : events) {
       LocalDateTime startTime = event.getStartTime();
       LocalDateTime endTime = event.getEndTime();
       int dayCol = startTime.getDayOfWeek().getValue() % 7;
       int startHour = startTime.getHour();
       int endHour = endTime.getHour();
-      int daySpan = endTime .getDayOfWeek().getValue() - startTime.getDayOfWeek().getValue();
+      int daySpan = endHour - startHour;
       if (daySpan < 0) {
         daySpan += 7;
       }
@@ -104,7 +190,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
           endY = endHour * cellHeight;
         }
         int rectHeight = endY - startY;
-        g.fillRect(column * cellWidth, startY, cellWidth, rectHeight);
+        graphics.fillRect(column * cellWidth, startY, cellWidth, rectHeight);
+        Rectangle eventRect = new Rectangle(column * cellWidth, startY, cellWidth, rectHeight);
+        eventRectangles.put(eventRect, event);
       }
     }
   }
@@ -138,7 +226,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(controlPanel, BorderLayout.SOUTH);
   }
 
-  private void loadXMLAction(ActionEvent e) {
+  private void loadXMLAction(ActionEvent actionEvent) {
     JFileChooser fileChooser = new JFileChooser();
     int option = fileChooser.showOpenDialog(this);
     if (option == JFileChooser.APPROVE_OPTION) {
@@ -149,15 +237,17 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
         List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
         if (!model.getUserName().contains(userId)) {
           model.addUser(userId);
-          userDropDown.addItem(userId);
+          userDropDown.addItem(userId);  // Update the user dropdown.
         }
         for (Event event : events) {
           model.createEvent(userId, event);
         }
+        //refresh view
         userDropDown.setSelectedItem(userId);
         loadUserSchedule(userId);
         updateView();
       } catch (Exception ex) {
+        //handle exceptions
         displayError("Failed to load the schedule from the XML file: " + ex.getMessage());
       }
     }
@@ -170,58 +260,98 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   }
 
   private void saveSchedulesAction(ActionEvent e) {
-    // Placeholder action for saving schedules
+    //Should just open an event frame
     System.out.println("Save schedules action triggered");
   }
 
-  protected void updateEvent(Event eventDetails) {
-    events.add(eventDetails);
-    schedulePanel.repaint();
+  private void eventListener() {
+    schedulePanel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent mouseEvent) {
+        for (Map.Entry<Rectangle, Event> entry : eventRectangles.entrySet()) {
+          if (entry.getKey().contains(mouseEvent.getPoint())) {
+            Event event = entry.getValue();
+            openEventDetails(event);
+            break;
+          }
+        }
+      }
+    });
   }
 
-  @Override
-  public void repaint() {
-    super.repaint();
-    if (schedulePanel != null) {
+  private void openEventDetails(Event event) {
+    //limits so only one frame can be opened and brings it to the front
+    if (currentFrame != null && currentFrame.isVisible()) {
+      currentFrame.dispose();
+    }
+    currentFrame = new EventFrame(model);
+    currentFrame.setEventDetails(event);
+    currentFrame.setVisible(true);
+    currentFrame.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent windowEvent) {
+        currentFrame = null;
+      }
+    });
+    //EventFrame eventFrame = new EventFrame(model);
+    //eventFrame.setEventDetails(event);
+    //eventFrame.setVisible(true);
+  }
+
+  private void eventCreation() {
+    schedulePanel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        dragStart = e.getPoint();
+      }
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        dragEnd = e.getPoint();
+        createEventFromSelection(dragStart, dragEnd);
+        dragStart = null;
+        dragEnd = null;
+      }
+    });
+    schedulePanel.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+        dragEnd = e.getPoint();
+        schedulePanel.repaint();
+      }
+    });
+  }
+
+  private void drawSelection(Graphics g) {
+    if (dragStart != null && dragEnd != null) {
+      g.setColor(Color.BLUE);
+      int x = Math.min(dragStart.x, dragEnd.x);
+      int y = Math.min(dragStart.y, dragEnd.y);
+      int width = Math.abs(dragStart.x - dragEnd.x);
+      int height = Math.abs(dragStart.y - dragEnd.y);
+      g.drawRect(x, y, width, height);
+    }
+  }
+
+  private void createEventFromSelection(Point start, Point end) {
+    LocalDateTime startTime = pointToDateTime(start);
+    LocalDateTime endTime = pointToDateTime(end);
+    String eventName = JOptionPane.showInputDialog("Enter Event Name:");
+    if (eventName != null && !eventName.isEmpty()) {
+      Event newEvent = new Event(eventName, "Location", false, startTime, endTime, false, "Host1");
+      model.createEvent("UserID", newEvent);
+      events.add(newEvent);
       schedulePanel.repaint();
     }
   }
 
-  @Override
-  public void updateView() {
-    // Get the selected user, handle null just in case.
-    Object selectedItem = userDropDown.getSelectedItem();
-    String selectedUser = (selectedItem != null) ? selectedItem.toString() : null;
-    // Temporarily remove the action listener to prevent actions during update.
-    ActionListener[] listeners = userDropDown.getActionListeners();
-    for (ActionListener listener : listeners) {
-      userDropDown.removeActionListener(listener);
-    }
-    // Update the drop-down items.
-    userDropDown.removeAllItems();
-    userDropDown.addItem("<none>");
-    for (String userName : model.getUserName()) {
-      userDropDown.addItem(userName);
-    }
-    // Restore the action listeners.
-    for (ActionListener listener : listeners) {
-      userDropDown.addActionListener(listener);
-    }
-    // Set the selected item, if it still exists.
-    if (selectedUser != null && Arrays.asList(userDropDown.getItemCount()).contains(selectedUser)) {
-      userDropDown.setSelectedItem(selectedUser);
-    }
-    // Now load the user schedule if a valid user is selected.
-    if (selectedUser != null && !"<none>".equals(selectedUser)) {
-      loadUserSchedule(selectedUser);
-    } else {
-      events.clear();
-      schedulePanel.repaint();
-    }
-  }
-
-  @Override
-  public void displayError(String message) {
-    JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+  private LocalDateTime pointToDateTime(Point point) {
+    int cellWidth = schedulePanel.getWidth() / 7;
+    int cellHeight = schedulePanel.getHeight() / 24;
+    int day = point.x / cellWidth;
+    int hour = point.y / cellHeight;
+    return LocalDate.now()
+            .with(DayOfWeek.SUNDAY.plus(day))
+            .atStartOfDay()
+            .plusHours(hour);
   }
 }

@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CentralSystem class manages user schedules within the planner system.
+ * CentralSystem class that is used as the main system of the planner system. Allows for
+ * managing a collection of user schedules.
  */
 public class CentralSystem implements CentralSystemModel {
   //Maps user Ids to their ScheduleModel objects

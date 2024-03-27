@@ -1,6 +1,10 @@
 package cs3500.planner.view;
 
-import java.awt.*;
+import java.time.format.DateTimeFormatter;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -14,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.DefaultListModel;
 
 import cs3500.planner.model.CentralSystem;
+import cs3500.planner.model.Event;
 
 public class EventFrame extends JFrame implements EventView {
   private CentralSystem centralSystem;
@@ -145,6 +150,7 @@ public class EventFrame extends JFrame implements EventView {
     }
   }
 
+  //need to implement this
   private void removeEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -171,16 +177,30 @@ public class EventFrame extends JFrame implements EventView {
     result += endingTimeField.getText().trim();
     return result;
   }
-
-//  @Override
-//  public void setEventDetails(Event event) {
-//    // Populate fields with event details if modifying an existing event
-//  }
 //
 //  @Override
 //  public void clearForm() {
 //    // Clear all input fields and selections
 //  }
+
+  @Override
+  public void setEventDetails(Event event) {
+    eventNameField.setText(event.getName());
+    eventLocationField.setText(event.getLocation());
+    isOnlineCheckbox.setSelected(event.isOnline());
+    startingDayComboBox.setSelectedItem(event.getStartTime().getDayOfWeek().toString());
+    startingTimeField.setText(event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+    endingDayComboBox.setSelectedItem(event.getEndTime().getDayOfWeek().toString());
+    endingTimeField.setText(event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+
+    // Populate the users list
+    DefaultListModel<String> listModel = new DefaultListModel<>();
+    for (String user : event.getInvitees()) {
+      listModel.addElement(user);
+    }
+    userList.setModel(listModel);
+    userList.setSelectedValue(event.getHostId(), true);
+  }
 
   @Override
   public void displayError(String message) {
