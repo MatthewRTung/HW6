@@ -122,6 +122,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
 
+  //helper method to initialize the menu bar
   private void initializeMenu() {
     JMenuBar menuBar = new JMenuBar();
     JMenu fileMenu = new JMenu("File");
@@ -135,6 +136,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.setJMenuBar(menuBar);
   }
 
+  //helper method to initialize the schedule panel
   private void initializeSchedulePanel() {
     schedulePanel = new JPanel() {
       protected void paintComponent(Graphics graphics) {
@@ -148,6 +150,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(schedulePanel, BorderLayout.CENTER);
   }
 
+  //helper method to
   private void drawGrid(Graphics graphics) {
     graphics.setColor(Color.LIGHT_GRAY);
     int rows = 24;

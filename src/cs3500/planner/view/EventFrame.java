@@ -116,7 +116,7 @@ public class EventFrame extends JFrame implements EventView {
     JScrollPane userListScrollPane = new JScrollPane(userList);
     constraints.gridx = 0;
     constraints.gridy = 8;
-    constraints.gridwidth = 3; // Span four columns for list
+    constraints.gridwidth = 3;
     constraints.fill = GridBagConstraints.BOTH;
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
@@ -140,7 +140,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(removeButton, constraints);
   }
 
-  //need to implement this
+  //helper method to add/modify an event in the system(not implemented yet)
   private void modifyEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -150,7 +150,7 @@ public class EventFrame extends JFrame implements EventView {
     }
   }
 
-  //need to implement this
+  //helper to remove an event from the system(not implemented yet)
   private void removeEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -160,12 +160,14 @@ public class EventFrame extends JFrame implements EventView {
     }
   }
 
+  //helper method to ensure that we have valid inputs
   private boolean validateInput() {
     return !eventNameField.getText().trim().isEmpty() &&
             !startingTimeField.getText().trim().isEmpty() &&
             !endingTimeField.getText().trim().isEmpty();
   }
 
+  //helper method to get the event details
   private String getEventDetails() {
     String result = "";
     result += eventNameField.getText().trim() + " ";
@@ -177,11 +179,7 @@ public class EventFrame extends JFrame implements EventView {
     result += endingTimeField.getText().trim();
     return result;
   }
-//
-//  @Override
-//  public void clearForm() {
-//    // Clear all input fields and selections
-//  }
+
 
   @Override
   public void setEventDetails(Event event) {
@@ -192,8 +190,6 @@ public class EventFrame extends JFrame implements EventView {
     startingTimeField.setText(event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")));
     endingDayComboBox.setSelectedItem(event.getEndTime().getDayOfWeek().toString());
     endingTimeField.setText(event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-    // Populate the users list
     DefaultListModel<String> listModel = new DefaultListModel<>();
     for (String user : event.getInvitees()) {
       listModel.addElement(user);

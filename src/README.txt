@@ -43,3 +43,5 @@ ReadOnlyModel that we created.
 - Used to hide the implementation details of the class and only give the client
 what needs to be seen.
 - Implemented only specific methods that a client should be able to see.
+- Added to the view, so EventFrame and its interface, CentralSystemFrame, and its interface...
+-
