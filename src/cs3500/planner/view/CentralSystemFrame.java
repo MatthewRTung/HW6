@@ -4,8 +4,10 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -40,16 +42,12 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private void initializeMenu() {
     JMenuBar menuBar = new JMenuBar();
     JMenu fileMenu = new JMenu("File");
-
     JMenuItem loadMenuItem = new JMenuItem("Add calendar");
     loadMenuItem.addActionListener(this::loadXMLAction);
-
     JMenuItem saveMenuItem = new JMenuItem("Save calendars");
     saveMenuItem.addActionListener(this::saveSchedulesAction);
-
     fileMenu.add(loadMenuItem);
     fileMenu.add(saveMenuItem);
-
     menuBar.add(fileMenu);
     this.setJMenuBar(menuBar);
   }
@@ -130,7 +128,6 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
       }
     });
     saveButton.addActionListener(this::saveSchedulesAction);
-
     loadButton.addActionListener(e -> {
       EventFrame eventFrame = new EventFrame(model);
       eventFrame.setVisible(true);
@@ -151,21 +148,29 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     if (option == JFileChooser.APPROVE_OPTION) {
       File selectedFile = fileChooser.getSelectedFile();
       XMLConfigurator configurator = new XMLConfigurator();
-      String userId = configurator.readScheduleUserId(selectedFile.getAbsolutePath());
-      if (userId != null && !userId.isEmpty()) {
-        if (!model.getUserName().contains(userId)) {
-          userDropDown.addItem(userId);
-          userDropDown.setSelectedItem(userId);
-          model.addUser(userId);
-        }
+      try {
+        // Attempt to read the user ID and events from the selected XML file.
+        String userId = configurator.readScheduleUserId(selectedFile.getAbsolutePath());
         List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
+
+        // Ensure the user is added to the model.
+        if (!model.getUserName().contains(userId)) {
+          model.addUser(userId);
+          userDropDown.addItem(userId);  // Update the user dropdown.
+        }
+
+        // Add events for the user.
         for (Event event : events) {
           model.createEvent(userId, event);
         }
+
+        // Refresh the view to show the loaded schedule.
+        userDropDown.setSelectedItem(userId);
         loadUserSchedule(userId);
         updateView();
-      } else {
-        displayError("The user ID could not be read from the XML file.");
+      } catch (Exception ex) {
+        // Handle any exceptions during XML parsing or event loading.
+        displayError("Failed to load the schedule from the XML file: " + ex.getMessage());
       }
     }
   }
@@ -196,13 +201,29 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
 
   @Override
   public void updateView() {
-    String selectedUser = Objects.requireNonNull(userDropDown.getSelectedItem()).toString();
+    // Get the selected user, handle null just in case.
+    Object selectedItem = userDropDown.getSelectedItem();
+    String selectedUser = (selectedItem != null) ? selectedItem.toString() : null;
+    // Temporarily remove the action listener to prevent actions during update.
+    ActionListener[] listeners = userDropDown.getActionListeners();
+    for (ActionListener listener : listeners) {
+      userDropDown.removeActionListener(listener);
+    }
+    // Update the drop-down items.
     userDropDown.removeAllItems();
     userDropDown.addItem("<none>");
     for (String userName : model.getUserName()) {
       userDropDown.addItem(userName);
     }
-    userDropDown.setSelectedItem(selectedUser);
+    // Restore the action listeners.
+    for (ActionListener listener : listeners) {
+      userDropDown.addActionListener(listener);
+    }
+    // Set the selected item, if it still exists.
+    if (selectedUser != null && Arrays.asList(userDropDown.getItemCount()).contains(selectedUser)) {
+      userDropDown.setSelectedItem(selectedUser);
+    }
+    // Now load the user schedule if a valid user is selected.
     if (selectedUser != null && !"<none>".equals(selectedUser)) {
       loadUserSchedule(selectedUser);
     } else {
