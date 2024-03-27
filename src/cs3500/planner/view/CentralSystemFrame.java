@@ -11,20 +11,37 @@ import javax.swing.JMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
 
-import java.awt.*;
+import java.awt.Rectangle;
+import java.awt.Point;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Graphics;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 import java.io.File;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.xml.XMLConfigurator;
 
+/***
+ *
+ */
 public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JPanel schedulePanel;
   private JComboBox<String> userDropDown;
@@ -32,8 +49,15 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JButton saveButton;
   private final List<Event> events;
   private final CentralSystem model;
-  private Map<Rectangle, Event> eventRectangles;
+  private final Map<Rectangle, Event> eventRectangles;
+  private EventFrame currentFrame;
+  private Point dragStart;
+  private Point dragEnd;
 
+  /**
+   *
+   * @param model
+   */
   public CentralSystemFrame(CentralSystem model) {
     super("Planner Central System");
     this.model = model;
@@ -41,8 +65,12 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.setLayout(new BorderLayout());
     events = new ArrayList<>();
     eventRectangles = new HashMap<>();
+    currentFrame = null;
+    dragStart = null;
+    dragEnd = null;
     initializeMenu();
     initializeSchedulePanel();
+    eventListener();
     initializeControlPanel();
     this.pack();
     this.setVisible(true);
@@ -77,7 +105,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
       userDropDown.addActionListener(listener);
     }
     //set the selected item if it exists
-    if (selectedUser != null && Arrays.asList(userDropDown.getItemCount()).contains(selectedUser)) {
+    if (selectedUser != null && Objects.equals(userDropDown.getItemCount(), selectedUser)) {
       userDropDown.setSelectedItem(selectedUser);
     }
     //load the schedule if its valid
@@ -109,10 +137,11 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
 
   private void initializeSchedulePanel() {
     schedulePanel = new JPanel() {
-      protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        drawGrid(g);
-        drawEvents(g);
+      protected void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+        drawGrid(graphics);
+        drawEvents(graphics);
+        drawSelection(graphics);
       }
     };
     schedulePanel.setPreferredSize(new Dimension(800, 600));
@@ -197,7 +226,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(controlPanel, BorderLayout.SOUTH);
   }
 
-  private void loadXMLAction(ActionEvent e) {
+  private void loadXMLAction(ActionEvent actionEvent) {
     JFileChooser fileChooser = new JFileChooser();
     int option = fileChooser.showOpenDialog(this);
     if (option == JFileChooser.APPROVE_OPTION) {
@@ -231,13 +260,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   }
 
   private void saveSchedulesAction(ActionEvent e) {
-    // Placeholder action for saving schedules
+    //Should just open an event frame
     System.out.println("Save schedules action triggered");
-  }
-
-  protected void updateEvent(Event eventDetails) {
-    events.add(eventDetails);
-    schedulePanel.repaint();
   }
 
   private void eventListener() {
@@ -256,8 +280,78 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   }
 
   private void openEventDetails(Event event) {
-    EventFrame eventFrame = new EventFrame(model);
-    eventFrame.setEventDetails(event);
-    eventFrame.setVisible(true);
+    //limits so only one frame can be opened and brings it to the front
+    if (currentFrame != null && currentFrame.isVisible()) {
+      currentFrame.dispose();
+    }
+    currentFrame = new EventFrame(model);
+    currentFrame.setEventDetails(event);
+    currentFrame.setVisible(true);
+    currentFrame.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent windowEvent) {
+        currentFrame = null;
+      }
+    });
+    //EventFrame eventFrame = new EventFrame(model);
+    //eventFrame.setEventDetails(event);
+    //eventFrame.setVisible(true);
+  }
+
+  private void eventCreation() {
+    schedulePanel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        dragStart = e.getPoint();
+      }
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        dragEnd = e.getPoint();
+        createEventFromSelection(dragStart, dragEnd);
+        dragStart = null;
+        dragEnd = null;
+      }
+    });
+    schedulePanel.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+        dragEnd = e.getPoint();
+        schedulePanel.repaint();
+      }
+    });
+  }
+
+  private void drawSelection(Graphics g) {
+    if (dragStart != null && dragEnd != null) {
+      g.setColor(Color.BLUE);
+      int x = Math.min(dragStart.x, dragEnd.x);
+      int y = Math.min(dragStart.y, dragEnd.y);
+      int width = Math.abs(dragStart.x - dragEnd.x);
+      int height = Math.abs(dragStart.y - dragEnd.y);
+      g.drawRect(x, y, width, height);
+    }
+  }
+
+  private void createEventFromSelection(Point start, Point end) {
+    LocalDateTime startTime = pointToDateTime(start);
+    LocalDateTime endTime = pointToDateTime(end);
+    String eventName = JOptionPane.showInputDialog("Enter Event Name:");
+    if (eventName != null && !eventName.isEmpty()) {
+      Event newEvent = new Event(eventName, "Location", false, startTime, endTime, false, "Host1");
+      model.createEvent("UserID", newEvent);
+      events.add(newEvent);
+      schedulePanel.repaint();
+    }
+  }
+
+  private LocalDateTime pointToDateTime(Point point) {
+    int cellWidth = schedulePanel.getWidth() / 7;
+    int cellHeight = schedulePanel.getHeight() / 24;
+    int day = point.x / cellWidth;
+    int hour = point.y / cellHeight;
+    return LocalDate.now()
+            .with(DayOfWeek.SUNDAY.plus(day))
+            .atStartOfDay()
+            .plusHours(hour);
   }
 }

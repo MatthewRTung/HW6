@@ -3,7 +3,8 @@ package cs3500.planner.model;
 import java.util.Map;
 
 /**
- * Interface for the main system model of the NUPlanner.
+ * CentralSystemModel interface that allows for mutable operations for the central system model
+ * of the planner system.
  */
 public interface CentralSystemModel extends ReadOnlyCentralSystemModel {
 

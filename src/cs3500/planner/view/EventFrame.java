@@ -1,7 +1,10 @@
 package cs3500.planner.view;
 
-import java.awt.*;
 import java.time.format.DateTimeFormatter;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
