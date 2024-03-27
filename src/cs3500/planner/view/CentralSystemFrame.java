@@ -30,11 +30,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setLayout(new BorderLayout());
     events = new ArrayList<>();
-
     initializeMenu();
     initializeSchedulePanel();
     initializeControlPanel();
-
     this.pack();
     this.setVisible(true);
   }
@@ -132,11 +130,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
       EventFrame eventFrame = new EventFrame(model);
       eventFrame.setVisible(true);
     });
-
     controlPanel.add(userDropDown);
     controlPanel.add(loadButton);
     controlPanel.add(saveButton);
-
     loadButton.setHorizontalAlignment(SwingConstants.CENTER);
     saveButton.setHorizontalAlignment(SwingConstants.CENTER);
     this.add(controlPanel, BorderLayout.SOUTH);
@@ -149,27 +145,19 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
       File selectedFile = fileChooser.getSelectedFile();
       XMLConfigurator configurator = new XMLConfigurator();
       try {
-        // Attempt to read the user ID and events from the selected XML file.
         String userId = configurator.readScheduleUserId(selectedFile.getAbsolutePath());
         List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
-
-        // Ensure the user is added to the model.
         if (!model.getUserName().contains(userId)) {
           model.addUser(userId);
-          userDropDown.addItem(userId);  // Update the user dropdown.
+          userDropDown.addItem(userId);
         }
-
-        // Add events for the user.
         for (Event event : events) {
           model.createEvent(userId, event);
         }
-
-        // Refresh the view to show the loaded schedule.
         userDropDown.setSelectedItem(userId);
         loadUserSchedule(userId);
         updateView();
       } catch (Exception ex) {
-        // Handle any exceptions during XML parsing or event loading.
         displayError("Failed to load the schedule from the XML file: " + ex.getMessage());
       }
     }
