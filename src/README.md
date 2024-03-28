@@ -41,5 +41,12 @@ Changes for PT2:
 - Created a read only interface for each class that we made. The model for each class extends the
   ReadOnlyModel that we created.
 - Used to hide the implementation details of the class and only give the client
+<<<<<<< HEAD:src/README.txt
+what needs to be seen.
+- Implemented only specific methods that a client should be able to see.
+- Added to the view, so EventFrame and its interface, CentralSystemFrame, and its interface...
+-
+=======
   what needs to be seen.
 - Implemented only specific methods that a client should be able to see.
+>>>>>>> bc7cd44b9ed190dbe88ac4c37a47fe3c127e1086:README.md

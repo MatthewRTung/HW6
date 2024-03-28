@@ -8,6 +8,10 @@ import cs3500.planner.model.Event;
  * It serves as a contract for setting event details and displaying error messages.
  */
 public interface EventView {
+<<<<<<< HEAD
+=======
+  void setEventDetails(Event event);
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
 
   /**
    * Sets the details of the event to be displayed in the view. This method is responsible

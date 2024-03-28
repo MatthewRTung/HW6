@@ -131,7 +131,7 @@ public class EventFrame extends JFrame implements EventView {
     JScrollPane userListScrollPane = new JScrollPane(userList);
     constraints.gridx = 0;
     constraints.gridy = 8;
-    constraints.gridwidth = 3; // Span four columns for list
+    constraints.gridwidth = 3;
     constraints.fill = GridBagConstraints.BOTH;
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
@@ -155,7 +155,13 @@ public class EventFrame extends JFrame implements EventView {
     this.add(removeButton, constraints);
   }
 
+<<<<<<< HEAD
   // Initializes the field for entering the event name.
+=======
+<<<<<<< HEAD
+  //helper method to add/modify an event in the system(not implemented yet)
+=======
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
   private void initializeEventName(GridBagConstraints constraints) {
     //Event Name
     eventNameField = new JTextField();
@@ -286,7 +292,12 @@ public class EventFrame extends JFrame implements EventView {
     this.add(removeButton, constraints);
   }
 
+<<<<<<< HEAD
   // Modifies the event based on the input provided in the frame.
+=======
+  //need to implement this
+>>>>>>> bc7cd44b9ed190dbe88ac4c37a47fe3c127e1086
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
   private void modifyEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -296,7 +307,11 @@ public class EventFrame extends JFrame implements EventView {
     }
   }
 
+<<<<<<< HEAD
   // Removes the event based on the input provided in the frame.
+=======
+  //helper to remove an event from the system(not implemented yet)
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
   private void removeEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -306,16 +321,24 @@ public class EventFrame extends JFrame implements EventView {
     }
   }
 
+<<<<<<< HEAD
   // Validates the input fields before event modification/removal.
 
+=======
+  //helper method to ensure that we have valid inputs
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
   private boolean validateInput() {
     return !eventNameField.getText().trim().isEmpty() &&
             !startingTimeField.getText().trim().isEmpty() &&
             !endingTimeField.getText().trim().isEmpty();
   }
 
+<<<<<<< HEAD
   // Constructs a string representation of the event details based on the input fields.
 
+=======
+  //helper method to get the event details
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
   private String getEventDetails() {
     String result = "";
     result += eventNameField.getText().trim() + " ";
@@ -327,6 +350,10 @@ public class EventFrame extends JFrame implements EventView {
     result += endingTimeField.getText().trim();
     return result;
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0087827707e68fffb845bfa316eac8043a96aae5
 
   /**
    * Sets the event details in the input fields of the frame.
@@ -342,8 +369,6 @@ public class EventFrame extends JFrame implements EventView {
     startingTimeField.setText(event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")));
     endingDayComboBox.setSelectedItem(event.getEndTime().getDayOfWeek().toString());
     endingTimeField.setText(event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-    // Populate the users list
     DefaultListModel<String> listModel = new DefaultListModel<>();
     for (String user : event.getInvitees()) {
       listModel.addElement(user);
