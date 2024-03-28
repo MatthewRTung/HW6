@@ -21,9 +21,8 @@ import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 
 /**
- * The GUI for the event frame.
+ * The GUI that creates the event frame for users to input event details.
  */
-
 public class EventFrame extends JFrame implements EventView {
   private CentralSystem centralSystem;
   private CentralSystemFrame frame;
@@ -40,10 +39,9 @@ public class EventFrame extends JFrame implements EventView {
   private JButton modifyButton;
 
   /**
-   *
-   * @param centralSystem
+   * Constructor for EventFrame to initialize the fields for the class.
+   * @param centralSystem the central system model
    */
-
   public EventFrame(CentralSystem centralSystem) {
     super("Event Planner");
     this.centralSystem = centralSystem;
@@ -57,101 +55,26 @@ public class EventFrame extends JFrame implements EventView {
     this.setVisible(true);
   }
 
+  //helper method to initialize the components
   private void initializeComponents() {
     this.setLayout(new GridBagLayout());
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.insets = new Insets(5, 5, 5, 5);
-    //Event Name
-    eventNameField = new JTextField();
-    constraints.gridx = 0;
-    constraints.gridy = 0;
-    this.add(new JLabel("Event Name:"), constraints);
-    constraints.gridx = 1;
-    constraints.gridwidth = 1;
-    this.add(eventNameField, constraints);
-    //Location Label
-    eventLocationField = new JTextField();
-    constraints.gridx = 0;
-    constraints.gridy = 1;
-    constraints.gridwidth = 1;
-    this.add(new JLabel("Location:"), constraints);
-    constraints.gridx = 1;
-    constraints.gridwidth = 1;
-    this.add(eventLocationField, constraints);
-    //Online Checkbox
-    isOnlineCheckbox = new JCheckBox("Is Online");
-    constraints.gridx = 0;
-    constraints.gridy = 2;
-    constraints.gridwidth = 4; // Span two columns
-    this.add(isOnlineCheckbox, constraints);
-    //Starting Day ComboBox
-    String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-    startingDayComboBox = new JComboBox<>(daysOfWeek);
-    constraints.gridx = 0;
-    constraints.gridy = 3;
-    constraints.gridwidth = 1;
-    this.add(new JLabel("Starting Day:"), constraints);
-    constraints.gridx = 0;
-    constraints.gridy = 4;
-    this.add(startingDayComboBox, constraints);
-    //Starting Time Field
-    startingTimeField = new JTextField();
-    constraints.gridx = 0;
-    constraints.gridy = 5;
-    this.add(new JLabel("Starting Time:"), constraints);
-    constraints.gridy = 6;
-    this.add(startingTimeField, constraints);
-    //Ending Day ComboBox
-    endingDayComboBox = new JComboBox<>(daysOfWeek);
-    constraints.gridx = 1;
-    constraints.gridy = 3;
-    this.add(new JLabel("Ending Day:"), constraints);
-    constraints.gridx = 4;
-    this.add(endingDayComboBox, constraints);
-    constraints.gridx = 1;
-    constraints.gridy = 4;
-    this.add(endingDayComboBox, constraints);
-    //Ending Time Field
-    endingTimeField = new JTextField();
-    constraints.gridx = 1;
-    constraints.gridy = 5;
-    this.add(new JLabel("Ending Time:"), constraints);
-    constraints.gridy = 6;
-    this.add(endingTimeField, constraints);
-    //Users List
-    userList = new JList<>(new DefaultListModel<>());
-    userList.setVisibleRowCount(4);
-    JScrollPane userListScrollPane = new JScrollPane(userList);
-    constraints.gridx = 0;
-    constraints.gridy = 8;
-    constraints.gridwidth = 3;
-    constraints.fill = GridBagConstraints.BOTH;
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    this.add(userListScrollPane, constraints);
-    constraints.gridx = 0;
-    constraints.gridy = 7;
-    constraints.gridwidth = 2;
-    this.add(new JLabel("Available Users:"), constraints);
-    //Reset
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    constraints.weighty = 0;
-    //Modify Button
-    constraints.gridx = 1;
-    constraints.gridy = 9;
-    constraints.gridwidth = 1;
-    this.add(modifyButton, constraints);
-    //Remove Button
-    constraints.gridx = 0;
-    constraints.gridy = 9;
-    constraints.gridwidth = 1;
-    this.add(removeButton, constraints);
+    initializeEventName(constraints);
+    initializeEventLocation(constraints);
+    initializeOnlineCheckbox(constraints);
+    initializeStartingTime(constraints);
+    initializeStartingDay(constraints);
+    initializeEndingTime(constraints);
+    initializeEndingDay(constraints);
+    initializeUserList(constraints);
+    initializeRemoveButton(constraints);
+    initializeModifyButton(constraints);
+    initializeReset(constraints);
   }
 
-<<<<<<< HEAD
   //helper method to add/modify an event in the system(not implemented yet)
-=======
   private void initializeEventName(GridBagConstraints constraints) {
     //Event Name
     eventNameField = new JTextField();
@@ -163,6 +86,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(eventNameField, constraints);
   }
 
+  //helper method to create the event location button
   private void initializeEventLocation(GridBagConstraints constraints) {
     //Location Label
     eventLocationField = new JTextField();
@@ -175,6 +99,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(eventLocationField, constraints);
   }
 
+  //helper method to create the is online checkbox
   private void initializeOnlineCheckbox(GridBagConstraints constraints) {
     //Online Checkbox
     isOnlineCheckbox = new JCheckBox("Is Online");
@@ -184,6 +109,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(isOnlineCheckbox, constraints);
   }
 
+  //helper method to create the starting day box
   private void initializeStartingDay(GridBagConstraints constraints) {
     //Starting Day ComboBox
     String[] daysOfWeek = {
@@ -198,6 +124,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(startingDayComboBox, constraints);
   }
 
+  //helper method to create the starting time box
   private void initializeStartingTime(GridBagConstraints constraints) {
     //Starting Time Field
     startingTimeField = new JTextField();
@@ -208,8 +135,11 @@ public class EventFrame extends JFrame implements EventView {
     this.add(startingTimeField, constraints);
   }
 
-  private void initializeEndingDay(GridBagConstraints constraints, String[] daysOfWeek) {
+  //helper method to create the end day box
+  private void initializeEndingDay(GridBagConstraints constraints) {
     //Ending Day ComboBox
+    String[] daysOfWeek = {
+            "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     endingDayComboBox = new JComboBox<>(daysOfWeek);
     constraints.gridx = 1;
     constraints.gridy = 3;
@@ -221,6 +151,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(endingDayComboBox, constraints);
   }
 
+  //helper method to create the end time box
   private void initializeEndingTime(GridBagConstraints constraints) {
     //Ending Time Field
     endingTimeField = new JTextField();
@@ -231,6 +162,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(endingTimeField, constraints);
   }
 
+  //helper method to create the list of invited useres
   private void initializeUserList(GridBagConstraints constraints) {
     //Users List
     userList = new JList<>(new DefaultListModel<>());
@@ -249,12 +181,14 @@ public class EventFrame extends JFrame implements EventView {
     this.add(new JLabel("Available Users:"), constraints);
   }
 
+  //helper method to reset the frame
   private void initializeReset(GridBagConstraints constraints) {
     //Reset
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weighty = 0;
   }
 
+  //helper method to add/modify button
   private void initializeModifyButton(GridBagConstraints constraints) {
     //Modify Button
     constraints.gridx = 1;
@@ -263,6 +197,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(modifyButton, constraints);
   }
 
+  //helper method to remove button
   private void initializeRemoveButton(GridBagConstraints constraints) {
     //Remove Button
     constraints.gridx = 0;
@@ -271,8 +206,7 @@ public class EventFrame extends JFrame implements EventView {
     this.add(removeButton, constraints);
   }
 
-  //need to implement this
->>>>>>> bc7cd44b9ed190dbe88ac4c37a47fe3c127e1086
+  //helper method to add/modify an event to the system(not implemented yet)
   private void modifyEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
@@ -334,5 +268,4 @@ public class EventFrame extends JFrame implements EventView {
   public void displayError(String message) {
     JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
-
 }

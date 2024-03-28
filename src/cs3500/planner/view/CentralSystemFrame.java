@@ -150,7 +150,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(schedulePanel, BorderLayout.CENTER);
   }
 
-  //helper method to
+  //helper method to draw the grid
   private void drawGrid(Graphics graphics) {
     graphics.setColor(Color.LIGHT_GRAY);
     int rows = 24;
@@ -168,6 +168,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  //helper method to draw the events
   private void drawEvents(Graphics graphics) {
     eventRectangles.clear();
     int cellWidth = schedulePanel.getWidth() / 7;
@@ -200,6 +201,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  //helper method to create the bottom panel and buttons
   private void initializeControlPanel() {
     JPanel controlPanel = new JPanel(new GridLayout(1, 0, 5, 0));
     loadButton = new JButton("Create event");
@@ -229,6 +231,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(controlPanel, BorderLayout.SOUTH);
   }
 
+  //helper method used to load the schedule from an XML file
   private void loadXMLAction(ActionEvent actionEvent) {
     JFileChooser fileChooser = new JFileChooser();
     int option = fileChooser.showOpenDialog(this);
@@ -240,7 +243,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
         List<Event> events = configurator.readXMLFile(selectedFile.getAbsolutePath());
         if (!model.getUserName().contains(userId)) {
           model.addUser(userId);
-          userDropDown.addItem(userId);  // Update the user dropdown.
+          userDropDown.addItem(userId);
         }
         for (Event event : events) {
           model.createEvent(userId, event);
@@ -256,17 +259,21 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  //helper method used to save the schedule to an XML file(doesn't do anything yet)
   private void loadUserSchedule(String userId) {
     events.clear();
     events.addAll(model.getEventsForUser(userId));
     schedulePanel.repaint();
   }
 
+  //helper method used to save the schedule to an XML file(doesn't do anything yet)
   private void saveSchedulesAction(ActionEvent e) {
     //Should just open an event frame
     System.out.println("Save schedules action triggered");
   }
 
+  //helper method that adds a mouse listener to the schedule panel. if a user clicks
+  //on an event, it will open the event details window
   private void eventListener() {
     schedulePanel.addMouseListener(new MouseAdapter() {
       @Override
@@ -282,6 +289,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     });
   }
 
+  //helper method to
   private void openEventDetails(Event event) {
     //limits so only one frame can be opened and brings it to the front
     if (currentFrame != null && currentFrame.isVisible()) {
