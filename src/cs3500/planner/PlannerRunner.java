@@ -10,8 +10,8 @@ import cs3500.planner.view.CentralSystemFrame;
 public class PlannerRunner {
 
   /**
-   * Constrcuts the program and runs it.
-   * @param args
+   * Constructs the NU Planner system and runs it.
+   * @param args command-line arguments.
    */
   public static void main(String[] args) {
     CentralSystem model = new CentralSystem();

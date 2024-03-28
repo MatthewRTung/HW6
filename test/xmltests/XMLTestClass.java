@@ -51,7 +51,7 @@ public class XMLTestClass {
     List<Event> event = xmlConfigurator.readXMLFile("CSStudent.xml");
     assertNotNull(event);
     assertFalse(event.isEmpty());
-    Event event1 = event.getFirst();
+    Event event1 = event.get(0);
     assertEquals("Algorithms Lecture", event1.getName());
     assertEquals("West Hall 301", event1.getLocation());
     assertFalse(event1.isOnline());
@@ -69,7 +69,7 @@ public class XMLTestClass {
     assertTrue(outputFile.exists());
     List<Event> readEvents = xmlConfigurator.readXMLFile(filePath);
     assertEquals(events.size(), readEvents.size());
-    assertEquals(events.getFirst().getName(), readEvents.getFirst().getName());
+    assertEquals(events.get(0).getName(), readEvents.get(0).getName());
     if (outputFile.exists()) {
       outputFile.delete();
     }

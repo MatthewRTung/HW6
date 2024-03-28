@@ -38,10 +38,10 @@ invariant was and how we enforced it. (We weren't exactly sure where to write it
 and also noted it here in the ReadMe just in case)
 
 Changes for PT2:
-- Created a read only interface for each class that we made. The model for each class extends the
-  ReadOnlyModel that we created.
-- Implemented the methods that we added the readonly implementations
-- Used to hide the implementation details of the class and only give the client
-- Implemented only specific methods that a client should be able to see.
+- Created a read only interface for each class in the model that we made. The model for each class 
+- extends the ReadOnlyModel that we created.
+- Implemented the methods that we added the readonly implementations.
+- Used the readonly interfaces to hide the implementation details of the class and only give the 
+- client.
 - Added to the view, so EventFrame and its interface, CentralSystemFrame, and its interface.
-- Implemented only specific methods that a client should be able to see.
+- Implemented those classes for the GUI and their frame.

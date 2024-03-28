@@ -39,14 +39,12 @@ import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.xml.XMLConfigurator;
 
-/***
- *
+/**
+ * CentralSystemFrame to create the central system gui grid that displays the schedule.
  */
 public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JPanel schedulePanel;
   private JComboBox<String> userDropDown;
-  private JButton loadButton;
-  private JButton saveButton;
   private final List<Event> events;
   private final CentralSystem model;
   private final Map<Rectangle, Event> eventRectangles;
@@ -55,8 +53,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private Point dragEnd;
 
   /**
-   *
-   * @param model
+   * Constructor for the CentralSystemFrame.
+   * @param model the central system model
    */
   public CentralSystemFrame(CentralSystem model) {
     super("Planner Central System");
@@ -204,8 +202,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   //helper method to create the bottom panel and buttons
   private void initializeControlPanel() {
     JPanel controlPanel = new JPanel(new GridLayout(1, 0, 5, 0));
-    loadButton = new JButton("Create event");
-    saveButton = new JButton("Schedule event");
+    JButton loadButton = new JButton("Create event");
+    JButton saveButton = new JButton("Schedule event");
     //takes list of user-names to pick from
     userDropDown = new JComboBox<>();
     userDropDown.addItem("<none>");
@@ -269,7 +267,14 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   //helper method used to save the schedule to an XML file(doesn't do anything yet)
   private void saveSchedulesAction(ActionEvent e) {
     //Should just open an event frame
-    System.out.println("Save schedules action triggered");
+    //System.out.println("Save schedules action triggered");
+    if (currentFrame != null && currentFrame.isVisible()) {
+      currentFrame.toFront(); // Brings the existing frame to the front if it's already open
+      return;
+    }
+    // This creates a new EventFrame, making it visible to the user for input
+    EventFrame eventFrame = new EventFrame(model);
+    eventFrame.setVisible(true);
   }
 
   //helper method that adds a mouse listener to the schedule panel. if a user clicks
@@ -309,12 +314,15 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     //eventFrame.setVisible(true);
   }
 
+  //helper method to highlight board(not fully implemented yet)
   private void eventCreation() {
     schedulePanel.addMouseListener(new MouseAdapter() {
+
       @Override
       public void mousePressed(MouseEvent e) {
         dragStart = e.getPoint();
       }
+
       @Override
       public void mouseReleased(MouseEvent e) {
         dragEnd = e.getPoint();
@@ -332,6 +340,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     });
   }
 
+  //helper method to draw the selected rectangle
   private void drawSelection(Graphics g) {
     if (dragStart != null && dragEnd != null) {
       g.setColor(Color.BLUE);
@@ -343,6 +352,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  //helper method to create an event based on the user
   private void createEventFromSelection(Point start, Point end) {
     LocalDateTime startTime = pointToDateTime(start);
     LocalDateTime endTime = pointToDateTime(end);
@@ -355,6 +365,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  //helper method to
   private LocalDateTime pointToDateTime(Point point) {
     int cellWidth = schedulePanel.getWidth() / 7;
     int cellHeight = schedulePanel.getHeight() / 24;

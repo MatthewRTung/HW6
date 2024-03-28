@@ -24,7 +24,6 @@ import cs3500.planner.model.Event;
  * The GUI that creates the event frame for users to input event details.
  */
 public class EventFrame extends JFrame implements EventView {
-  private CentralSystem centralSystem;
   private CentralSystemFrame frame;
 
   private JTextField eventNameField;
@@ -44,7 +43,6 @@ public class EventFrame extends JFrame implements EventView {
    */
   public EventFrame(CentralSystem centralSystem) {
     super("Event Planner");
-    this.centralSystem = centralSystem;
     removeButton = new JButton("Remove Event");
     modifyButton = new JButton("Modify Event");
     modifyButton.addActionListener(e -> modifyEvent());
@@ -112,8 +110,7 @@ public class EventFrame extends JFrame implements EventView {
   //helper method to create the starting day box
   private void initializeStartingDay(GridBagConstraints constraints) {
     //Starting Day ComboBox
-    String[] daysOfWeek = {
-            "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    String[] daysOfWeek = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
     startingDayComboBox = new JComboBox<>(daysOfWeek);
     constraints.gridx = 0;
     constraints.gridy = 3;
@@ -138,8 +135,7 @@ public class EventFrame extends JFrame implements EventView {
   //helper method to create the end day box
   private void initializeEndingDay(GridBagConstraints constraints) {
     //Ending Day ComboBox
-    String[] daysOfWeek = {
-            "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    String[] daysOfWeek = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
     endingDayComboBox = new JComboBox<>(daysOfWeek);
     constraints.gridx = 1;
     constraints.gridy = 3;
