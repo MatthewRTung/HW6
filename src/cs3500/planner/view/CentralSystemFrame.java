@@ -39,8 +39,9 @@ import cs3500.planner.model.CentralSystem;
 import cs3500.planner.model.Event;
 import cs3500.planner.xml.XMLConfigurator;
 
-/***
- *
+/**
+ * The CentralSystemFrame class provides a graphical user interface for the central system planner.
+ * It includes functionality to create, display, and manipulate calendar events.
  */
 public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private JPanel schedulePanel;
@@ -55,8 +56,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private Point dragEnd;
 
   /**
+   * Constructs a CentralSystemFrame object with the specified model.
    *
-   * @param model
+   * @param model The central system model this frame interacts with.
    */
   public CentralSystemFrame(CentralSystem model) {
     super("Planner Central System");
@@ -76,6 +78,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.setVisible(true);
   }
 
+  /**
+   * Repaints this component and its schedule panel.
+   */
   @Override
   public void repaint() {
     super.repaint();
@@ -84,6 +89,9 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  /**
+   * Updates the view to reflect any changes in the model.
+   */
   @Override
   public void updateView() {
     //get the user and handle null users
@@ -117,10 +125,17 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  /**
+   * Displays an error message dialog.
+   *
+   * @param message The error message to display.
+   */
   @Override
   public void displayError(String message) {
     JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
+
+  // Initializes the menu bar and its items.
 
   private void initializeMenu() {
     JMenuBar menuBar = new JMenuBar();
@@ -135,6 +150,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.setJMenuBar(menuBar);
   }
 
+  // Initializes the panel that displays the schedule.
   private void initializeSchedulePanel() {
     schedulePanel = new JPanel() {
       protected void paintComponent(Graphics graphics) {
@@ -148,6 +164,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(schedulePanel, BorderLayout.CENTER);
   }
 
+  // Draws the grid background for the schedule panel.
   private void drawGrid(Graphics graphics) {
     graphics.setColor(Color.LIGHT_GRAY);
     int rows = 24;
@@ -165,6 +182,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  // Draws the event rectangles on the schedule panel.
   private void drawEvents(Graphics graphics) {
     eventRectangles.clear();
     int cellWidth = schedulePanel.getWidth() / 7;
@@ -197,6 +215,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+
+   // Initializes the control panel with buttons and dropdowns.
   private void initializeControlPanel() {
     JPanel controlPanel = new JPanel(new GridLayout(1, 0, 5, 0));
     loadButton = new JButton("Create event");
@@ -226,6 +246,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     this.add(controlPanel, BorderLayout.SOUTH);
   }
 
+  // Action handler for loading an XML file containing events.
   private void loadXMLAction(ActionEvent actionEvent) {
     JFileChooser fileChooser = new JFileChooser();
     int option = fileChooser.showOpenDialog(this);
@@ -253,17 +274,20 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  // Loads the user's schedule and updates the view.
   private void loadUserSchedule(String userId) {
     events.clear();
     events.addAll(model.getEventsForUser(userId));
     schedulePanel.repaint();
   }
 
+  // Action handler for saving schedules.
   private void saveSchedulesAction(ActionEvent e) {
     //Should just open an event frame
     System.out.println("Save schedules action triggered");
   }
 
+  // Adds a mouse listener to the schedule panel for event interactions.
   private void eventListener() {
     schedulePanel.addMouseListener(new MouseAdapter() {
       @Override
@@ -279,6 +303,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     });
   }
 
+  // Opens the details of a selected event in a new frame.
   private void openEventDetails(Event event) {
     //limits so only one frame can be opened and brings it to the front
     if (currentFrame != null && currentFrame.isVisible()) {
@@ -298,6 +323,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     //eventFrame.setVisible(true);
   }
 
+  // Handles the creation of events through mouse drag selection.
   private void eventCreation() {
     schedulePanel.addMouseListener(new MouseAdapter() {
       @Override
@@ -321,6 +347,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     });
   }
 
+
+   // Draws a selection rectangle on the schedule panel during event creation.
   private void drawSelection(Graphics g) {
     if (dragStart != null && dragEnd != null) {
       g.setColor(Color.BLUE);
@@ -332,6 +360,8 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+
+  // Creates an event based on a selection made with the mouse.
   private void createEventFromSelection(Point start, Point end) {
     LocalDateTime startTime = pointToDateTime(start);
     LocalDateTime endTime = pointToDateTime(end);
@@ -344,6 +374,7 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
     }
   }
 
+  // Converts a point on the schedule panel to a LocalDateTime object.
   private LocalDateTime pointToDateTime(Point point) {
     int cellWidth = schedulePanel.getWidth() / 7;
     int cellHeight = schedulePanel.getHeight() / 24;
