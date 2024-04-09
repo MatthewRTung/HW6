@@ -29,6 +29,7 @@ import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -380,10 +381,17 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
   private LocalDateTime pointToDateTime(Point point) {
     int cellWidth = schedulePanel.getWidth() / 7;
     int cellHeight = schedulePanel.getHeight() / 24;
-    int day = point.x / cellWidth;
+    int column = point.x / cellWidth; // Column where the user clicked
     int hour = point.y / cellHeight;
+
+    // Adjust this to the day your grid starts with, e.g., if it starts with Monday:
+    DayOfWeek startOfWeek = DayOfWeek.MONDAY;
+
+    // Adjust the day based on the starting day of your grid
+    DayOfWeek dayOfWeek = startOfWeek.plus(column % 7); // Use modulo 7 for safety
+
     return LocalDate.now()
-            .with(DayOfWeek.SUNDAY.plus(day))
+            .with(TemporalAdjusters.previousOrSame(dayOfWeek)) // This ensures it's the correct day of this week
             .atStartOfDay()
             .plusHours(hour);
   }
