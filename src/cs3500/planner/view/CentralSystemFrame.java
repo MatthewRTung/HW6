@@ -216,7 +216,10 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
         loadUserSchedule(selectedUser);
       }
     });
-    saveButton.addActionListener(this::saveSchedulesAction);
+    saveButton.addActionListener(e -> {
+      EventFrame eventFrame = new EventFrame(model);
+      eventFrame.setVisible(true);
+    });
     loadButton.addActionListener(e -> {
       EventFrame eventFrame = new EventFrame(model);
       eventFrame.setVisible(true);
@@ -266,15 +269,23 @@ public class CentralSystemFrame extends JFrame implements CentralSystemView {
 
   //helper method used to save the schedule to an XML file(doesn't do anything yet)
   private void saveSchedulesAction(ActionEvent e) {
-    //Should just open an event frame
-    //System.out.println("Save schedules action triggered");
-    if (currentFrame != null && currentFrame.isVisible()) {
-      currentFrame.toFront(); // Brings the existing frame to the front if it's already open
-      return;
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Save Calendar");
+    fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+    fileChooser.setApproveButtonText("Save");
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.addChoosableFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("XML files (*.xml)", "xml"));
+
+    int userSelection = fileChooser.showSaveDialog(this);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+      File fileToSave = fileChooser.getSelectedFile();
+      if (!fileToSave.getName().toLowerCase().endsWith(".xml")) {
+        fileToSave = new File(fileToSave + ".xml");
+      }
+      System.out.println("Save as file: " + fileToSave.getAbsolutePath());
     }
-    // This creates a new EventFrame, making it visible to the user for input
-    EventFrame eventFrame = new EventFrame(model);
-    eventFrame.setVisible(true);
   }
 
   //helper method that adds a mouse listener to the schedule panel. if a user clicks
