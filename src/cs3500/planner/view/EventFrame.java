@@ -127,6 +127,7 @@ public class EventFrame extends JFrame implements EventView {
     startingTimeField = new JTextField();
     constraints.gridx = 0;
     constraints.gridy = 5;
+    constraints.gridwidth = 1;
     this.add(new JLabel("Starting Time:"), constraints);
     constraints.gridy = 6;
     this.add(startingTimeField, constraints);
@@ -153,6 +154,7 @@ public class EventFrame extends JFrame implements EventView {
     endingTimeField = new JTextField();
     constraints.gridx = 1;
     constraints.gridy = 5;
+    constraints.gridwidth = 1;
     this.add(new JLabel("Ending Time:"), constraints);
     constraints.gridy = 6;
     this.add(endingTimeField, constraints);
