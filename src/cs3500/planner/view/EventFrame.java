@@ -36,6 +36,7 @@ public class EventFrame extends JFrame implements EventView {
   private JList<String> userList;
   private JButton removeButton;
   private JButton modifyButton;
+  private JButton createButton;
 
   /**
    * Constructor for EventFrame to initialize the fields for the class.
@@ -45,8 +46,10 @@ public class EventFrame extends JFrame implements EventView {
     super("Event Planner");
     removeButton = new JButton("Remove Event");
     modifyButton = new JButton("Modify Event");
+    createButton = new JButton("Create Event");
     modifyButton.addActionListener(e -> modifyEvent());
     removeButton.addActionListener(e -> removeEvent());
+    createButton.addActionListener(e -> createEvent());
     initializeComponents();
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     this.pack();
@@ -70,6 +73,7 @@ public class EventFrame extends JFrame implements EventView {
     initializeRemoveButton(constraints);
     initializeModifyButton(constraints);
     initializeReset(constraints);
+    initializeCreateButton(constraints);
   }
 
   //helper method to add/modify an event in the system(not implemented yet)
@@ -204,11 +208,19 @@ public class EventFrame extends JFrame implements EventView {
     this.add(removeButton, constraints);
   }
 
+  //helper method to initialize a create button for the event frame
+  private void initializeCreateButton(GridBagConstraints constraints) {
+    constraints.gridx = 0;
+    constraints.gridy = 10;
+    constraints.gridwidth = 1;
+    this.add(createButton, constraints);
+  }
+
   //helper method to add/modify an event to the system(not implemented yet)
   private void modifyEvent() {
     if (validateInput()) {
       String eventDetails = getEventDetails();
-      System.out.println("Create event: " + eventDetails);
+      System.out.println("Modify event: " + eventDetails);
     } else {
       displayError("Error: Missing event information for modification.");
     }
@@ -223,6 +235,17 @@ public class EventFrame extends JFrame implements EventView {
       displayError("Error: Missing event information for removal.");
     }
   }
+
+  //helper method to create an event from the system
+  private void createEvent() {
+    if (validateInput()) {
+      String eventDetails = getEventDetails();
+      System.out.println("Created event" + eventDetails);
+    } else {
+      displayError("Error: Missing information for creation.");
+    }
+  }
+
 
   //helper method to ensure that we have valid inputs
   private boolean validateInput() {
